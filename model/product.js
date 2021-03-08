@@ -6,7 +6,7 @@ const productSchema = new mongoose.Schema({
         required: true,
         min: 6
     },
-    code: {
+    SKU: {
         type: String,
         required: true,
         min: 3
@@ -29,6 +29,11 @@ const productSchema = new mongoose.Schema({
         type: Number,
         required: false
     },
+    img: { data: Buffer, contentType: String },
+    manufacturer: {
+        type: String,
+        required: false,
+    }
 });
 
 module.exports = mongoose.model('Product', productSchema);

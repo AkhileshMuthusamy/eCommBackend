@@ -22,6 +22,7 @@ mongoose
 const authRoute = require('./routes/auth');
 const postsRoute = require('./routes/posts');
 const tokenRoute = require('./routes/token');
+const categoryRoute = require('./routes/category');
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -32,6 +33,7 @@ app.use(upload.array('allfile', 12));
 app.use('/api/user', authRoute);
 app.use('/api/posts', postsRoute);
 app.use('/api/token', tokenRoute);
+app.use('/api/category', categoryRoute);
 
 app.get('/', (req, res) => {
     res.send('Server is up and running!');
@@ -39,4 +41,5 @@ app.get('/', (req, res) => {
 
 app.listen(port, () => {
     console.log(`Server listening on ${appUrl}`);
+    console.log('press CTRL+C to exit');
 });
