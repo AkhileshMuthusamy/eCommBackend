@@ -6,12 +6,12 @@ function signToken(payload) {
    * expiresIn: seconds
    */
   return new Promise((resolve, reject) => {
-    jwt.sign(payload, process.env.TOKEN_SECRET, { expiresIn: 60 * 1 }, (error, token) => {
+    jwt.sign(payload, process.env.TOKEN_SECRET, { expiresIn: 60 * 5 }, (error, token) => {
       if (error) reject(error);
 
       resolve({
         success: true,
-        token: `Bearer ${token}`,
+        token: `${token}`,
       });
 
     });

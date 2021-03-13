@@ -1,5 +1,20 @@
 const mongoose = require('mongoose');
 
+const uploadSchema = new mongoose.Schema({
+    filename : {
+        type : String,
+        required: true
+    },
+    contentType : {
+        type: String,
+        required : true
+    },
+    imageBase64 : {
+        type : String,
+        required: true
+    }
+})
+
 const productSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -9,6 +24,7 @@ const productSchema = new mongoose.Schema({
     SKU: {
         type: String,
         required: true,
+        unique: true,
         min: 3
     },
     sellingPrice: {
@@ -18,7 +34,7 @@ const productSchema = new mongoose.Schema({
     description: {
         type: String,
         required: true,
-        max: 1024,
+        max: 4000,
         min: 6
     },
     dimension: {
@@ -29,7 +45,10 @@ const productSchema = new mongoose.Schema({
         type: Number,
         required: false
     },
-    img: { data: Buffer, contentType: String },
+    category: {
+        type: String,
+    },
+    images: [uploadSchema],
     manufacturer: {
         type: String,
         required: false,

@@ -21,6 +21,7 @@ mongoose
 //Import Routes
 const authRoute = require('./routes/auth');
 const postsRoute = require('./routes/posts');
+const productRoute = require('./routes/product')
 const tokenRoute = require('./routes/token');
 const categoryRoute = require('./routes/category');
 
@@ -34,6 +35,7 @@ app.use('/api/user', authRoute);
 app.use('/api/posts', postsRoute);
 app.use('/api/token', tokenRoute);
 app.use('/api/category', categoryRoute);
+app.use('/api/product', productRoute);
 
 app.get('/', (req, res) => {
     res.send('Server is up and running!');

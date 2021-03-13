@@ -7,7 +7,7 @@ const signToken = require('../middleware/signToken');
 router.post('/register', async (req, res) => {
   // Check if request body contains all required fields
   if (!req.body.firstName || !req.body.lastName || !req.body.email || !req.body.password || !req.body.role || !req.body.phone) {
-    return res.status(400).json({error: true, error: 'One or more required field missing' });
+    return res.status(400).json({error: true, message: 'One or more required field missing' });
   }
   // Check if user already exists in the database
   const emailExist = await userModel.findOne({ email: req.body.email });
