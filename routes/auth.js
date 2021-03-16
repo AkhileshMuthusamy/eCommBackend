@@ -57,10 +57,10 @@ router.post('/login', (req, res) => {
       if (isMatch) {
         console.log('Password matched');
 
-        signToken({ _id: user._id, ip: req.ip })
-          .then(token => {
+        signToken({ _id: user._id, role: req.body.role })
+          .then(({token}) => {
             console.log(token);
-            res.status(200).json({data: token, error: false});
+            res.status(200).json({data: {token, role: req.body.role}, error: false});
           })
           .catch(error => {
             console.log(error);
