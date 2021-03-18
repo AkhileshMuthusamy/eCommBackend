@@ -59,8 +59,9 @@ router.post('/login', (req, res) => {
 
         signToken({ _id: user._id, role: req.body.role })
           .then(({token}) => {
-            console.log(token);
-            res.status(200).json({data: {token, role: req.body.role}, error: false});
+            const {firstName, lastName, email, phone, address} = user;
+            profile = {firstName, lastName, email, phone, address}
+            res.status(200).json({data: {token, role: req.body.role, profile}, error: false});
           })
           .catch(error => {
             console.log(error);

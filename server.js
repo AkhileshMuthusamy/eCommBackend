@@ -10,7 +10,7 @@ var upload = multer({
 const { port, appUrl, databaseUrl } = require('./config');
 
 mongoose
-  .connect(databaseUrl, { useNewUrlParser: true, useUnifiedTopology: true })
+  .connect(databaseUrl, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false, useCreateIndex: true })
   .then(() => {
     console.log('Connected to db!');
   })
