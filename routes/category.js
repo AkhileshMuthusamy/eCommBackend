@@ -46,14 +46,15 @@ router.put('/', (req, res) => {
     });
 });
 
-router.delete('/', (req, res) => {
-    if (!req.body._id) {
+router.delete('/:_id', (req, res) => {
+    console.log(req.params._id);
+    if (!req.params._id) {
         res.status(400).json({error: true, message: 'One or more required field missing' });
     }
 
-    categoryModel.findById({_id: req.body._id}).then(record => {
+    categoryModel.findById({_id: req.params._id}).then(record => {
         if (record.child.length == 0) {
-            categoryModel.findByIdAndDelete({_id: req.body._id}).then(() => {
+            categoryModel.findByIdAndDelete({_id: req.params._id}).then(() => {
                 res.status(200).json({error: false, message: 'Category deleted successfully'});
             }).catch((err) => {
                 console.log(err);
