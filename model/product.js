@@ -3,15 +3,15 @@ const mongoose = require('mongoose');
 const uploadSchema = new mongoose.Schema({
     filename : {
         type : String,
-        required: true
+        required: false
     },
     contentType : {
         type: String,
-        required : true
+        required : false
     },
     imageBase64 : {
         type : String,
-        required: true
+        required: false
     }
 })
 

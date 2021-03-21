@@ -23,7 +23,10 @@ router.post('/', async(req, res) => {
 
     let imgArray = [];
 
-    if (req.files) {
+    console.log(!req.files.length)
+    console.log(req.files.length)
+    if (req.files.length > 0) {
+        console.log('I am inside here');
         imgArray = req.files.map((file) => {
             encode_image = {
                 filename: filename(file.originalname),
@@ -59,12 +62,29 @@ router.post('/', async(req, res) => {
 router.get('/', async(req, res) => {
     try {
         console.log(req.query.s)
-        if (!req.query.s) {
+        if (!req.query.s && !req.query.id) {
             const products = await productModel.find();
             res.status(200).json({data: products.length > 0 ? products : [], error: false});
+        } else if (req.query.id) {
+            const products = await productModel.findById({_id: req.query.id});
+            res.status(200).json({data: products, error: false});
         } else {
             const products = await productModel.find({'name': {'$regex': req.query.s, '$options': 'i'}});
             res.status(200).json({data: products.length > 0 ? products : [], error: false});
+        }
+    } catch (err) {
+        console.log(err)
+        res.status(400).json({error: true, message: 'Error while loading products'});
+    }
+})
+
+router.get('/category/:id', async(req, res) => {
+    try {
+        if (req.params.id) {
+            const products = await productModel.find({category: req.params.id});
+            res.status(200).json({data: products.length > 0 ? products : [], error: false});
+        } else {
+            res.status(400).json({error: true, message: 'Missing Parameter'});
         }
     } catch (err) {
         console.log(err)
