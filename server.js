@@ -24,6 +24,7 @@ const postsRoute = require('./routes/posts');
 const productRoute = require('./routes/product')
 const tokenRoute = require('./routes/token');
 const categoryRoute = require('./routes/category');
+const orderRoute = require('./routes/order');
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -36,6 +37,7 @@ app.use('/api/posts', postsRoute);
 app.use('/api/token', tokenRoute);
 app.use('/api/category', categoryRoute);
 app.use('/api/product', productRoute);
+app.use('/api/order', orderRoute);
 
 app.get('/', (req, res) => {
     res.send('Server is up and running!');

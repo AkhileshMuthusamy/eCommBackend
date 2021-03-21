@@ -17,14 +17,23 @@ router.post('/', async(req, res) => {
         return res.status(400).json({error: true, message: 'One or more required field missing' });
     }
 
-    let imgArray = req.files.map((file) => {
-        encode_image = {
-            filename: filename(file.originalname),
-            contentType: file.mimetype,
-            imageBase64: file.buffer.toString('base64')
-        };
-        return encode_image;
-    })
+    // Check if user SKU exists in the database
+    const skuExist = await productModel.findOne({ SKU: req.body.SKU });
+    if (skuExist) return res.status(400).json({error: true, message: 'SKU already exists'});
+
+    let imgArray = [];
+
+    if (req.files) {
+        imgArray = req.files.map((file) => {
+            encode_image = {
+                filename: filename(file.originalname),
+                contentType: file.mimetype,
+                imageBase64: file.buffer.toString('base64')
+            };
+            return encode_image;
+        });
+    }
+    
     
     const product = new productModel({
         name: req.body.name,
@@ -52,7 +61,7 @@ router.get('/', async(req, res) => {
         console.log(req.query.s)
         if (!req.query.s) {
             const products = await productModel.find();
-            res.status(200).json({data: products.length > 0 ? products[0] : [], error: false});
+            res.status(200).json({data: products.length > 0 ? products : [], error: false});
         } else {
             const products = await productModel.find({'name': {'$regex': req.query.s, '$options': 'i'}});
             res.status(200).json({data: products.length > 0 ? products : [], error: false});
@@ -77,24 +86,37 @@ router.put('/', (req, res) => {
     });
 })
 
-router.delete('/', (req, res) => {
-    if (!req.body.SKU) {
+router.delete('/:SKU', (req, res) => {
+    if (!req.params.SKU) {
         return res.status(400).json({error: true, message: 'One or more required field missing' });
     }
 
     try {
-        productModel.deleteOne({ SKU: req.body.SKU }).then(() => {
+        productModel.deleteOne({ SKU: req.params.SKU }).then(() => {
             res.status(200).json({data: null, error: false});
         }).catch((err) => {
             console.log(err);
-            res.status(400).json({error: true, message: 'Error while saving product'});
+            res.status(400).json({error: true, message: 'Error while deleting product'});
         });
     } catch (err) {
         console.log(err);
-        res.status(400).json({error: true, message: 'Error while saving product'});
+        res.status(400).json({error: true, message: 'Error while deleting product'});
     }
 })
 
+router.get('/recent', (req, res) => {
+    try {
+        productModel.find().sort({ _id: -1 }).limit(10).then((record) => {
+            res.status(200).json({data: record, error: false});
+        }).catch((err) => {
+            console.log(err);
+            res.status(400).json({error: true, message: 'Error while fetching recent product'});
+        });
+    } catch (err) {
+        console.log(err);
+        res.status(400).json({error: true, message: 'Error while fetching recent product'});
+    }
+})
 
 function filename(fileName) {
     let ext = fileName.substr(fileName.lastIndexOf('.'));

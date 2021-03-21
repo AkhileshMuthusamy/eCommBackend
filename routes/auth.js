@@ -24,7 +24,12 @@ router.post('/register', async (req, res) => {
     email: req.body.email,
     password: hashedPassword,
     role: req.body.role,
-    phone: req.body.phone
+    phone: req.body.phone,
+    address: req.body.address || '',
+    postcode: req.body.postcode || '',
+    city: req.body.city || '',
+    state: req.body.state || '',
+    country: req.body.country || ''
   });
   try {
     const savedUser = await user.save();
@@ -70,6 +75,41 @@ router.post('/login', (req, res) => {
       } else {
         console.log('Password mismatch');
         return res.status(400).json({error: true, message: 'Invalid password'});
+      }
+    });
+  });
+});
+
+router.post('/change-password', async(req, res) => {
+  // Check if request body contains all required fields
+  if (!req.body.email || !req.body.password || !req.body.newPassword || !req.body.role) {
+    return res.status(400).json({error: true, message: 'One or more required field missing' });
+  }
+
+  // Hash password
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(req.body.newPassword, salt);
+
+  // Check if email already exists in the database
+  userModel.findOne({ email: req.body.email }).then(user => {
+    if (!user) {
+      return res.status(400).json({error: true, message: "Email doesn't exists"});
+    }
+
+    if (user.role !== req.body.role) {
+      return res.status(400).json({error: true, message: "Invalid access"});
+    }
+
+    bcrypt.compare(req.body.password, user.password).then(isMatch => {
+      if (isMatch) {
+        userModel.findOneAndUpdate({email: req.body.email}, {password: hashedPassword}, {upsert: false}).then(() => {
+          res.status(200).json({data: null, error: false, message: 'Password changed successfully'});
+        }).catch((err) => {
+          console.log(err);
+          res.status(400).json({error: true, message: 'Error while updating password'});
+        });
+      } else {
+        res.status(400).json({error: true, message: 'Error while updating password'});
       }
     });
   });
