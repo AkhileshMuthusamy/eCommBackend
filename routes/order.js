@@ -43,10 +43,10 @@ router.post('/', (req, res) => {
 
     try {
         order.save().then((record) => {
-            const emailTemplateData = { changePasswordLink: 'www.google.co.in' };
-            const toAddress = 'makilesh005@gmail.com';
-            const subject = 'Test HTML Template';
-            const emailTemplate = './email/templates/forgotEmail.template.ejs';
+            const emailTemplateData = { orderId: record._id, orderDate: record.orderDate };
+            const toAddress = record.email;
+            const subject = `Order Received | Order Id: ${record._id}`;
+            const emailTemplate = './email/templates/new_order.ejs';
             isEmailSuccess = false;
             mailer
                 .sendHtmlEmail(toAddress, subject, emailTemplate, emailTemplateData)
