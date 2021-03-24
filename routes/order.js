@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const verify = require('./verifyToken');
 const orderModel = require('../model/order');
+const mailer = require('../_modules/mailer');
 
 router.get('/', (req, res) => {
     try {
@@ -42,6 +43,21 @@ router.post('/', (req, res) => {
 
     try {
         order.save().then((record) => {
+            const emailTemplateData = { changePasswordLink: 'www.google.co.in' };
+            const toAddress = 'makilesh005@gmail.com';
+            const subject = 'Test HTML Template';
+            const emailTemplate = './email/templates/forgotEmail.template.ejs';
+            isEmailSuccess = false;
+            mailer
+                .sendHtmlEmail(toAddress, subject, emailTemplate, emailTemplateData)
+                .then(info => {
+                    console.log('Message sent: %s', info.messageId);
+                    isEmailSuccess = true;
+                })
+                .catch(err => {
+                    console.log(err);
+                    isEmailSuccess = false;
+                });
             res.status(200).json({data: record, error: false});
         }).catch((err) => {
             console.log(err);
