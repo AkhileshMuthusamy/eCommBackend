@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const verify = require('./verifyToken');
 const productModel = require('../model/product');
+const orderModel = require('../model/order');
 
 // router.get('/', verify, (req, res) => {
 //     res.json({
@@ -136,7 +137,61 @@ router.get('/recent', (req, res) => {
         console.log(err);
         res.status(400).json({error: true, message: 'Error while fetching recent product'});
     }
-})
+});
+
+router.post('/review', async(req, res) => {
+    try {
+        if (req.body.productId) {
+            await productModel.findByIdAndUpdate({_id: req.body.productId}, { $push: { reviews: req.body.productReviewData  } });
+            const order = await orderModel.findOne({_id: req.body.orderId});
+            const order_prd = order.products.filter(prd => {
+                return prd._id === req.body.productId
+            });
+            order_prd[0].rating = req.body.orderReviewData.rating;
+            order_prd[0].title = req.body.orderReviewData.title;
+            order_prd[0].message = req.body.orderReviewData.message;
+            const order_n = await orderModel.findByIdAndUpdate({_id: req.body.orderId}, {products: order.products});
+            res.status(200).json({data: order_n, error: false});
+        } else {
+            res.status(400).json({error: true, message: 'Missing Parameter'});
+        }
+    } catch (err) {
+        console.log(err)
+        res.status(400).json({error: true, message: 'Error while loading products'});
+    }
+});
+
+router.put('/review', async(req, res) => {
+    try {
+        if (req.body.productId) {
+            const product = await productModel.findOne({_id: req.body.productId});
+            const prd_review = product.reviews.filter(prd => {
+                return prd.orderId === req.body.orderId
+            });
+            prd_review[0].rating = req.body.productReviewData.rating;
+            prd_review[0].title = req.body.productReviewData.title;
+            prd_review[0].message = req.body.productReviewData.message;
+            prd_review[0].username = req.body.productReviewData.username;
+            prd_review[0].reviewDate = Date.now
+            
+            const order = await orderModel.findOne({_id: req.body.orderId});
+            const order_prd = order.products.filter(prd => {
+                return prd._id === req.body.productId
+            });
+            order_prd[0].rating = req.body.orderReviewData.rating;
+            order_prd[0].title = req.body.orderReviewData.title;
+            order_prd[0].message = req.body.orderReviewData.message;
+            const order_n = await orderModel.findByIdAndUpdate({_id: req.body.orderId}, {products: order.products});
+            await productModel.findByIdAndUpdate({_id: req.body.productId}, { reviews: product.reviews });
+            res.status(200).json({data: order_n, error: false});
+        } else {
+            res.status(400).json({error: true, message: 'Missing Parameter'});
+        }
+    } catch (err) {
+        console.log(err)
+        res.status(400).json({error: true, message: 'Error while loading products'});
+    }
+});
 
 function filename(fileName) {
     let ext = fileName.substr(fileName.lastIndexOf('.'));

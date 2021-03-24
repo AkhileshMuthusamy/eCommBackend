@@ -15,6 +15,33 @@ const uploadSchema = new mongoose.Schema({
     }
 })
 
+const reviewSchema = new mongoose.Schema({
+    rating : {
+        type : Number,
+        required: false
+    },
+    title : {
+        type: String,
+        required : false
+    },
+    message : {
+        type: String,
+        required : false
+    },
+    orderId: {
+        type: String,
+        required: false
+    },
+    reviewDate: {
+        type: Date,
+        default: Date.now
+    },
+    username: {
+        type: String,
+        required: false
+    }
+})
+
 const productSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -52,7 +79,8 @@ const productSchema = new mongoose.Schema({
     manufacturer: {
         type: String,
         required: false,
-    }
+    },
+    reviews: [reviewSchema]
 });
 
 module.exports = mongoose.model('Product', productSchema);
