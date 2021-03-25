@@ -115,4 +115,13 @@ router.post('/change-password', async(req, res) => {
   });
 });
 
+router.get('/', (req, res) => {
+  userModel.find({role: 'USER'}).then((record) => {
+    res.status(200).json({data: record, error: false});
+  }).catch((err) => {
+      console.log(err);
+      res.status(400).json({error: true, message: 'Error while fetching user'});
+  });
+});
+
 module.exports = router;
