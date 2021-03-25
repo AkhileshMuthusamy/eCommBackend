@@ -27,7 +27,6 @@ router.post('/', async(req, res) => {
     console.log(!req.files.length)
     console.log(req.files.length)
     if (req.files.length > 0) {
-        console.log('I am inside here');
         imgArray = req.files.map((file) => {
             encode_image = {
                 filename: filename(file.originalname),
@@ -95,17 +94,50 @@ router.get('/category/:id', async(req, res) => {
 
 router.put('/', (req, res) => {
 
-    if (!req.body.SKU) {
+    if (!req.body._id) {
         res.status(400).json({error: true, message: 'One or more required field missing' });
     }
 
-    productModel.findOneAndUpdate({SKU: req.body.SKU}, req.body, {upsert: false}).then(() => {
+    productModel.findOneAndUpdate({_id: req.body._id}, req.body, {upsert: false}).then(async() => {
+        let imgArray = [];
+
+        if (req.files.length > 0) {
+            imgArray = req.files.map((file) => {
+                encode_image = {
+                    filename: filename(file.originalname),
+                    contentType: file.mimetype,
+                    imageBase64: file.buffer.toString('base64')
+                };
+                return encode_image;
+            });
+        }
+
+        if (imgArray.length > 0) {
+            await productModel.findByIdAndUpdate({_id: req.body._id}, { $push: { images: imgArray  } });
+        }
         res.status(200).json({error: false, message: 'Product updated successfully'});
     }).catch((err) => {
         console.log(err);
         res.status(400).json({error: true, message: 'Error while updating product'});
     });
-})
+});
+
+router.put('/delete-image', async(req, res) => {
+
+    if (!req.body._id || !req.body.imageId) {
+        res.status(400).json({error: true, message: 'One or more required field missing' });
+    }
+
+    try {
+        const product = await productModel.findOne({_id: req.body._id});
+        product.images.pull({ _id: req.body.imageId  })
+        await product.save()
+        res.status(200).json({error: false, message: 'Image deleted successfully'});
+    } catch(err) {
+        console.log(err);
+        res.status(400).json({error: true, message: 'Error while deleting image'});
+    }
+});
 
 router.delete('/:SKU', (req, res) => {
     if (!req.params.SKU) {
