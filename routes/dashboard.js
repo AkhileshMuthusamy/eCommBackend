@@ -1,10 +1,10 @@
 const router = require('express').Router();
-const verify = require('./verifyToken');
+const verifyAdmin = require('./verifyAdminToken');
 const productModel = require('../model/product');
 const orderModel = require('../model/order');
 const userModel = require('../model/user');
 
-router.get('/', async(req, res) => {
+router.get('/', verifyAdmin, async(req, res) => {
     try {
         const userCount = await userModel.countDocuments({role: "USER"});
         const pendingOrderCount = await orderModel.countDocuments({status: "PENDING"});

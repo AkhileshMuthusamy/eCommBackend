@@ -3,6 +3,8 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const userModel = require('../model/user');
 const signToken = require('../middleware/signToken');
+const verify = require('./verifyToken');
+const verifyAdmin = require('./verifyAdminToken');
 
 router.post('/register', async (req, res) => {
   // Check if request body contains all required fields
@@ -64,8 +66,8 @@ router.post('/login', (req, res) => {
 
         signToken({ _id: user._id, role: req.body.role })
           .then(({token}) => {
-            const {firstName, lastName, email, phone, address} = user;
-            profile = {firstName, lastName, email, phone, address}
+            const {firstName, lastName, email, phone, address, city, state, postcode, country} = user;
+            profile = {firstName, lastName, email, phone, address, city, state, postcode, country}
             res.status(200).json({data: {token, role: req.body.role, profile}, error: false});
           })
           .catch(error => {
@@ -80,7 +82,7 @@ router.post('/login', (req, res) => {
   });
 });
 
-router.post('/change-password', async(req, res) => {
+router.post('/change-password', verify, async(req, res) => {
   // Check if request body contains all required fields
   if (!req.body.email || !req.body.password || !req.body.newPassword || !req.body.role) {
     return res.status(400).json({error: true, message: 'One or more required field missing' });
@@ -115,12 +117,27 @@ router.post('/change-password', async(req, res) => {
   });
 });
 
-router.get('/', (req, res) => {
+router.get('/', verifyAdmin, (req, res) => {
   userModel.find({role: 'USER'}).then((record) => {
     res.status(200).json({data: record, error: false});
   }).catch((err) => {
       console.log(err);
       res.status(400).json({error: true, message: 'Error while fetching user'});
+  });
+});
+
+router.put('/update-profile', verify, (req, res) => {
+
+  if (!req.body.email) {
+      res.status(400).json({error: true, message: 'One or more required field missing' });
+      return;
+  }
+
+  userModel.findOneAndUpdate({email: req.body.email}, req.body, {upsert: false}).then((record) => {
+      res.status(200).json({error: false, message: 'Profile Updated'});
+  }).catch((err) => {
+      console.log(err);
+      res.status(400).json({error: true, message: 'Error while updating profile'});
   });
 });
 

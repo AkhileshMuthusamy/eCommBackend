@@ -1,5 +1,7 @@
 const router = require('express').Router();
 const verify = require('./verifyToken');
+const verifyAdmin = require('./verifyAdminToken');
+const verifyUser = require('./verifyUserToken');
 const productModel = require('../model/product');
 const orderModel = require('../model/order');
 
@@ -12,7 +14,7 @@ const orderModel = require('../model/order');
 //     });
 // })
 
-router.post('/', async(req, res) => {
+router.post('/', verifyAdmin, async(req, res) => {
 
     if (!req.body.name || !req.body.sellingPrice || !req.body.SKU) {
         return res.status(400).json({error: true, message: 'One or more required field missing' });
@@ -92,7 +94,7 @@ router.get('/category/:id', async(req, res) => {
     }
 })
 
-router.put('/', (req, res) => {
+router.put('/', verifyAdmin, (req, res) => {
 
     if (!req.body._id) {
         res.status(400).json({error: true, message: 'One or more required field missing' });
@@ -122,7 +124,7 @@ router.put('/', (req, res) => {
     });
 });
 
-router.put('/delete-image', async(req, res) => {
+router.put('/delete-image', verifyAdmin, async(req, res) => {
 
     if (!req.body._id || !req.body.imageId) {
         res.status(400).json({error: true, message: 'One or more required field missing' });
@@ -139,7 +141,7 @@ router.put('/delete-image', async(req, res) => {
     }
 });
 
-router.delete('/:SKU', (req, res) => {
+router.delete('/:SKU', verifyAdmin, (req, res) => {
     if (!req.params.SKU) {
         return res.status(400).json({error: true, message: 'One or more required field missing' });
     }
@@ -171,7 +173,7 @@ router.get('/recent', (req, res) => {
     }
 });
 
-router.post('/review', async(req, res) => {
+router.post('/review', verifyUser, async(req, res) => {
     try {
         if (req.body.productId) {
             await productModel.findByIdAndUpdate({_id: req.body.productId}, { $push: { reviews: req.body.productReviewData  } });
@@ -193,7 +195,7 @@ router.post('/review', async(req, res) => {
     }
 });
 
-router.put('/review', async(req, res) => {
+router.put('/review', verifyUser, async(req, res) => {
     try {
         if (req.body.productId) {
             const product = await productModel.findOne({_id: req.body.productId});
