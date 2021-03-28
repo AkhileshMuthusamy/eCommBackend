@@ -5,6 +5,7 @@ const userModel = require('../model/user');
 const signToken = require('../middleware/signToken');
 const verify = require('./verifyToken');
 const verifyAdmin = require('./verifyAdminToken');
+const verifyUser = require('./verifyUserToken');
 
 router.post('/register', async (req, res) => {
   // Check if request body contains all required fields
@@ -126,7 +127,7 @@ router.get('/', verifyAdmin, (req, res) => {
   });
 });
 
-router.put('/update-profile', verify, (req, res) => {
+router.put('/update-profile', verifyUser, (req, res) => {
 
   if (!req.body.email) {
       res.status(400).json({error: true, message: 'One or more required field missing' });

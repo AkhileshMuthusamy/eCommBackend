@@ -1,5 +1,7 @@
 const router = require('express').Router();
 const verify = require('./verifyToken');
+const verifyAdmin = require('./verifyAdminToken');
+const verifyUser = require('./verifyUserToken');
 const orderModel = require('../model/order');
 const mailer = require('../_modules/mailer');
 var moment = require('moment');
@@ -70,7 +72,7 @@ router.post('/', (req, res) => {
     }
 });
 
-router.put('/admin-cancel', (req, res) => {
+router.put('/admin-cancel', verifyAdmin, (req, res) => {
 
     if (!req.body._id) {
         res.status(400).json({error: true, message: 'One or more required field missing' });
@@ -100,7 +102,7 @@ router.put('/admin-cancel', (req, res) => {
     });
 });
 
-router.put('/user-cancel', (req, res) => {
+router.put('/user-cancel', verifyUser, (req, res) => {
 
     if (!req.body._id) {
         res.status(400).json({error: true, message: 'One or more required field missing' });
@@ -130,7 +132,7 @@ router.put('/user-cancel', (req, res) => {
     });
 });
 
-router.put('/ship-order', (req, res) => {
+router.put('/ship-order', verifyAdmin, (req, res) => {
 
     if (!req.body._id) {
         res.status(400).json({error: true, message: 'One or more required field missing' });

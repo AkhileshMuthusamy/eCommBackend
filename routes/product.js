@@ -5,15 +5,6 @@ const verifyUser = require('./verifyUserToken');
 const productModel = require('../model/product');
 const orderModel = require('../model/order');
 
-// router.get('/', verify, (req, res) => {
-//     res.json({
-//         posts: {
-//             title: 'my first post',
-//             description: 'random data you shouldnt access'
-//         }
-//     });
-// })
-
 router.post('/', verifyAdmin, async(req, res) => {
 
     if (!req.body.name || !req.body.sellingPrice || !req.body.SKU) {
