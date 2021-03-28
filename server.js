@@ -20,9 +20,7 @@ mongoose
 
 //Import Routes
 const authRoute = require('./routes/auth');
-const postsRoute = require('./routes/posts');
 const productRoute = require('./routes/product')
-const tokenRoute = require('./routes/token');
 const categoryRoute = require('./routes/category');
 const orderRoute = require('./routes/order');
 const dashboardRoute = require('./routes/dashboard');
@@ -34,8 +32,6 @@ app.use(upload.array('allfile', 12));
 
 //Route Middlewares
 app.use('/api/user', authRoute);
-app.use('/api/posts', postsRoute);
-app.use('/api/token', tokenRoute);
 app.use('/api/category', categoryRoute);
 app.use('/api/product', productRoute);
 app.use('/api/order', orderRoute);
